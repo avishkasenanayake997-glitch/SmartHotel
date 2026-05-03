@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity, StyleSheet,
-  TextInput, StatusBar, RefreshControl,
+  TextInput, StatusBar, RefreshControl, useWindowDimensions
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
@@ -21,6 +21,14 @@ const HomeScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('All');
+
+  const { width } = useWindowDimensions();
+  // Provide a max-width for ultra-wide screens to prevent over-stretching
+  const MAX_CONTENT_WIDTH = 1200;
+  const contentWidth = Math.min(width, MAX_CONTENT_WIDTH);
+  
+  const numColumns = contentWidth > 1024 ? 4 : contentWidth > 768 ? 3 : contentWidth > 480 ? 2 : 1;
+  const cardWidth = (contentWidth - (SPACING.base * (numColumns + 1))) / numColumns;
 
   const fetchRooms = async () => {
     try {
@@ -51,6 +59,7 @@ const HomeScreen = ({ navigation }) => {
   const renderRoom = ({ item }) => (
     <RoomCard
       room={item}
+      cardWidth={cardWidth}
       onPress={() => navigation.navigate('RoomDetail', { roomId: item._id })}
       onEdit={() => navigation.navigate('EditRoom', { room: item })}
       onDelete={() => handleDelete(item)}
@@ -62,60 +71,62 @@ const HomeScreen = ({ navigation }) => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>Hello, {user?.name?.split(' ')[0]} 👋</Text>
-          <Text style={styles.subtitle}>{isAdmin ? 'Manage your hostel rooms' : 'Find your perfect room'}</Text>
+      <View style={[styles.contentContainer, { width: contentWidth }]}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.greeting}>Hello, {user?.name?.split(' ')[0]} 👋</Text>
+            <Text style={styles.subtitle}>{isAdmin ? 'Manage your hostel rooms' : 'Find your perfect room'}</Text>
+          </View>
+          {isAdmin && (
+            <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('AddRoom')}>
+              <Ionicons name="add" size={22} color={COLORS.textInverse} />
+            </TouchableOpacity>
+          )}
         </View>
-        {isAdmin && (
-          <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('AddRoom')}>
-            <Ionicons name="add" size={22} color={COLORS.textInverse} />
-          </TouchableOpacity>
-        )}
-      </View>
 
-      {/* Search */}
-      <View style={styles.searchContainer}>
-        <Ionicons name="search-outline" size={16} color={COLORS.textMuted} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search rooms..."
-          placeholderTextColor={COLORS.textMuted}
-          value={search}
-          onChangeText={setSearch}
-        />
-        {search.length > 0 && (
-          <TouchableOpacity onPress={() => setSearch('')}>
-            <Ionicons name="close-circle" size={16} color={COLORS.textMuted} />
-          </TouchableOpacity>
-        )}
-      </View>
+        {/* Search */}
+        <View style={styles.searchContainer}>
+          <Ionicons name="search-outline" size={16} color={COLORS.textMuted} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search rooms..."
+            placeholderTextColor={COLORS.textMuted}
+            value={search}
+            onChangeText={setSearch}
+          />
+          {search.length > 0 && (
+            <TouchableOpacity onPress={() => setSearch('')}>
+              <Ionicons name="close-circle" size={16} color={COLORS.textMuted} />
+            </TouchableOpacity>
+          )}
+        </View>
 
-      {/* Type filters */}
-      <View style={styles.filtersRow}>
-        {FILTERS.map(f => (
-          <TouchableOpacity
-            key={f}
-            style={[styles.filterBtn, typeFilter === f && styles.filterBtnActive]}
-            onPress={() => setTypeFilter(f)}
-          >
-            <Text style={[styles.filterBtnText, typeFilter === f && styles.filterBtnTextActive]}>{f}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+        {/* Type filters */}
+        <View style={styles.filtersRow}>
+          {FILTERS.map(f => (
+            <TouchableOpacity
+              key={f}
+              style={[styles.filterBtn, typeFilter === f && styles.filterBtnActive]}
+              onPress={() => setTypeFilter(f)}
+            >
+              <Text style={[styles.filterBtnText, typeFilter === f && styles.filterBtnTextActive]}>{f}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-      {/* Rooms Grid */}
-      {loading ? (
-        <LoadingSpinner message="Loading rooms..." />
-      ) : (
-        <FlatList
-          data={rooms}
-          keyExtractor={item => item._id}
-          renderItem={renderRoom}
-          numColumns={2}
-          columnWrapperStyle={styles.row}
-          contentContainerStyle={styles.listContent}
+        {/* Rooms Grid */}
+        {loading ? (
+          <LoadingSpinner message="Loading rooms..." />
+        ) : (
+          <FlatList
+            key={numColumns} // Force re-render when columns change
+            data={rooms}
+            keyExtractor={item => item._id}
+            renderItem={renderRoom}
+            numColumns={numColumns}
+            columnWrapperStyle={numColumns > 1 ? styles.row : undefined}
+            contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchRooms(); }} tintColor={COLORS.primary} />}
           ListEmptyComponent={
@@ -127,12 +138,14 @@ const HomeScreen = ({ navigation }) => {
           }
         />
       )}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.background },
+  container: { flex: 1, backgroundColor: COLORS.background, alignItems: 'center' },
+  contentContainer: { flex: 1, width: '100%' },
   header: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     paddingHorizontal: SPACING.base, paddingTop: SPACING.xl + 20, paddingBottom: SPACING.base,
@@ -160,8 +173,8 @@ const styles = StyleSheet.create({
   filterBtnActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
   filterBtnText: { color: COLORS.textSecondary, fontSize: FONTS.sizes.sm, fontWeight: '600' },
   filterBtnTextActive: { color: COLORS.textInverse },
-  row: { paddingHorizontal: SPACING.base, justifyContent: 'space-between' },
-  listContent: { paddingBottom: SPACING.xxl },
+  row: { paddingHorizontal: SPACING.base, gap: SPACING.base },
+  listContent: { paddingBottom: SPACING.xxl, paddingHorizontal: SPACING.base },
   emptyContainer: { alignItems: 'center', paddingTop: SPACING.xxxl * 2 },
   emptyEmoji: { fontSize: 52, marginBottom: SPACING.base },
   emptyText: { color: COLORS.textPrimary, fontSize: FONTS.sizes.lg, fontWeight: '700' },

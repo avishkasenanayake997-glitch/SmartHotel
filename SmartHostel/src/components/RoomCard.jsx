@@ -13,15 +13,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { COLORS, RADIUS, SPACING, FONTS, SHADOWS } from '../constants/theme';
 import StatusBadge from './StatusBadge';
 
-const { width } = Dimensions.get('window');
-const CARD_WIDTH = (width - SPACING.base * 3) / 2;
-
-const RoomCard = ({ room, onPress, onEdit, onDelete, isAdmin }) => {
+const RoomCard = ({ room, onPress, onEdit, onDelete, isAdmin, cardWidth }) => {
   const hasImage = room?.image?.url && room.image.url !== '';
 
   return (
     <TouchableOpacity
-      style={styles.card}
+      style={[styles.card, { width: cardWidth }]}
       onPress={onPress}
       activeOpacity={0.85}
     >
@@ -89,7 +86,6 @@ const RoomCard = ({ room, onPress, onEdit, onDelete, isAdmin }) => {
 
 const styles = StyleSheet.create({
   card: {
-    width: CARD_WIDTH,
     backgroundColor: COLORS.card,
     borderRadius: RADIUS.lg,
     borderWidth: 1,

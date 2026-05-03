@@ -114,7 +114,7 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   flex: { flex: 1, backgroundColor: COLORS.background },
   container: { flex: 1 },
-  content: { padding: SPACING.base, paddingTop: SPACING.xxxl, paddingBottom: SPACING.xxl },
+  content: { padding: SPACING.base, paddingTop: SPACING.xxxl, paddingBottom: SPACING.xxl, width: '100%', maxWidth: 450, alignSelf: 'center' },
   header: { alignItems: 'center', marginBottom: SPACING.xxl },
   logoContainer: {
     width: 80, height: 80, borderRadius: 40,

@@ -144,6 +144,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: COLORS.card, borderRadius: RADIUS.xl, borderWidth: 1,
     borderColor: COLORS.cardBorder, margin: SPACING.base, marginBottom: 0, padding: SPACING.xl,
+    width: '100%', maxWidth: 700, alignSelf: 'center',
   },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.base },
   cardTitle: { fontSize: FONTS.sizes.lg, fontWeight: '700', color: COLORS.textPrimary },
@@ -169,6 +170,7 @@ const styles = StyleSheet.create({
     margin: SPACING.base, marginBottom: SPACING.xxxl,
     paddingVertical: SPACING.base, borderRadius: RADIUS.lg,
     borderWidth: 1.5, borderColor: COLORS.error,
+    width: '100%', maxWidth: 700, alignSelf: 'center',
   },
   logoutBtnText: { color: COLORS.error, fontSize: FONTS.sizes.md, fontWeight: '700' },
 });
