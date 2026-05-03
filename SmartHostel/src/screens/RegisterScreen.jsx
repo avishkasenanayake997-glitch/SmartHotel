@@ -105,7 +105,7 @@ const RegisterScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   flex: { flex: 1, backgroundColor: COLORS.background },
   container: { flex: 1 },
-  content: { padding: SPACING.base, paddingTop: SPACING.xl, paddingBottom: SPACING.xxl },
+  content: { padding: SPACING.base, paddingTop: SPACING.xl, paddingBottom: SPACING.xxl, width: '100%', maxWidth: 500, alignSelf: 'center' },
   header: { alignItems: 'center', marginBottom: SPACING.xl },
   backBtn: { alignSelf: 'flex-start', padding: SPACING.sm, marginBottom: SPACING.base },
   logoContainer: {

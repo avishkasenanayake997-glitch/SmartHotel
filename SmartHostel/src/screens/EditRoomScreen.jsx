@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   },
   backBtn: { padding: SPACING.sm },
   navTitle: { fontSize: FONTS.sizes.lg, fontWeight: '800', color: COLORS.textPrimary },
-  content: { padding: SPACING.base, paddingBottom: SPACING.xxxl },
+  content: { padding: SPACING.base, paddingBottom: SPACING.xxxl, width: '100%', maxWidth: 700, alignSelf: 'center' },
   sectionLabel: { color: COLORS.textSecondary, fontSize: FONTS.sizes.sm, fontWeight: '600', marginBottom: SPACING.sm, marginTop: SPACING.xs },
   typeRow: { flexDirection: 'row', gap: SPACING.sm, marginBottom: SPACING.base },
   typeBtn: {
